@@ -15,7 +15,7 @@ console.log(appleSongs);
 import spotifySongs from "./spotifySongs.json" assert { type: "json" };
 import GenericSong from "./genericSong.js";
 
-console.log(intersect(appleSongs as GenericSong[], spotifySongs as GenericSong[]));
+console.log(intersect(appleSongs as GenericSong[], spotifySongs as GenericSong[]).length);
 debugger;
 
 // export const helloWorld = functions.https.onRequest(async (request, response) => {
