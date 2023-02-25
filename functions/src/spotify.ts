@@ -1,6 +1,9 @@
+import {config} from "dotenv";
+
 import SpotifyWebApi from "spotify-web-api-node";
 import GenericSong from "./genericSong";
 const spotifyApi = new SpotifyWebApi();
+config({debug: true});
 spotifyApi.setAccessToken(process.env.SPOTIFY_TOKEN as string);
 
 
@@ -11,12 +14,9 @@ const fetchAllPages = async (apiCall: any) => {
 
     let pos = 0;
     while (page.body.next) {
-        console.log(page.body.offset, page.body.limit);
         page = await apiCall({ offset: pos });
-        console.log(page);
         items.push(...page.body.items);
         pos += page.body.limit;
-        console.log(page.body);
     }
     return items;
 };
@@ -37,6 +37,6 @@ const mapSong = (song: any) : GenericSong => ({
 })
 
 const songs = (await fetchAllPages((opts: any) => spotifyApi.getMySavedTracks(opts))).filter(songIsValid).map(mapSong);
-console.log(songs);
+console.log("spotify songs", songs);
 
 export {songs};
