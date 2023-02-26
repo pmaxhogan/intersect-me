@@ -2,10 +2,20 @@ import {config} from "dotenv";
 
 import SpotifyWebApi from "spotify-web-api-node";
 import GenericSong from "./genericSong";
-const spotifyApi = new SpotifyWebApi();
-config({debug: true});
+
+config();
+
+export const getSpotifyApi = () => new SpotifyWebApi({
+    redirectUri: process.env.SPOTIFY_REDIRECT_URI,
+    clientId: process.env.SPOTIFY_CLIENT_ID,
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+});
+const spotifyApi = getSpotifyApi();
 spotifyApi.setAccessToken(process.env.SPOTIFY_TOKEN as string);
 
+
+const scopes = "user-library-read user-follow-read playlist-read-private playlist-read-collaborative user-top-read user-read-recently-played".split(" ");
+console.log(spotifyApi.createAuthorizeURL(scopes, "state"));
 
 const fetchAllPages = async <T>(apiCall: fetchApiCallback<T>): Promise<T[]> => {
     const items = [];
@@ -38,9 +48,11 @@ const mapSong = (song: SavedTrackObject) : GenericSong => ({
     provider: "spotify",
 });
 
+const getLikedSongs = async (spotifyApi: SpotifyWebApi) => {
+    const results = await fetchAllPages((opts: offsetOpts | undefined) => spotifyApi.getMySavedTracks(opts)) as SavedTrackObject[];
+    const songs = results.filter(songIsValid).map(mapSong);
+    console.log("spotify songs", songs.length);
+    return songs;
+};
 
-const results = await fetchAllPages((opts: offsetOpts | undefined) => spotifyApi.getMySavedTracks(opts)) as SavedTrackObject[];
-const songs = results.filter(songIsValid).map(mapSong);
-console.log("spotify songs", songs);
-
-export {songs};
+export {getLikedSongs};

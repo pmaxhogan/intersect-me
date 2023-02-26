@@ -21,6 +21,11 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ]
+    ],
+    "rewrites": [ {
+      "source": "/api/**",
+      "function": "api",
+      "region": "us-central1"
+    } ]
   }
 }

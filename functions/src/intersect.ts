@@ -1,4 +1,5 @@
-import GenericSong from "./genericSong";
+import type GenericSong from "./genericSong";
+import {getLikes} from "./db.js";
 
 // .replaceAll(/[\.\(\)\[\]<>_,]/g, " ")
 // const replaceMe = /[(\[](feat. [^)\n]+|Live( [0-9]+)?|(Remastered|Radio|Original|Extended) ?(Edit|Recording|Mix|Version)?)[\])]|\(From [^)]+\)/g;
@@ -9,9 +10,9 @@ const cleanUp = (str: string) => str.toLowerCase().replace(replaceMe, " ").repla
 
 const startsWithCross = (a: string, b: string) => cleanUp(a).startsWith(cleanUp(b)) || cleanUp(b).startsWith(cleanUp(a));
 
-const intersect = (songs: GenericSong[], songs2: GenericSong[]): GenericSong[][] => {
-    console.log(songs.map((song) => [cleanUp(song.name), cleanUp(song.artist)]));
-    console.log(songs2.map((song) => [cleanUp(song.name), cleanUp(song.artist)]));
+export const intersect = (songs: GenericSong[], songs2: GenericSong[]): GenericSong[][] => {
+    // console.log(songs.map((song) => [cleanUp(song.name), cleanUp(song.artist)]));
+    // console.log(songs2.map((song) => [cleanUp(song.name), cleanUp(song.artist)]));
     const intersectedSongs: GenericSong[][] = [];
     songs2.forEach((song2) => {
         let found = false;
@@ -22,9 +23,12 @@ const intersect = (songs: GenericSong[], songs2: GenericSong[]): GenericSong[][]
             }
         });
 
-        if (!found) console.log("not found", song2);
+        // if (!found) console.log("not found", song2);
     });
     return intersectedSongs;
 };
 
-export {intersect};
+export const intersectUids = async (uid1: string, uid2: string): Promise<GenericSong[][]> => {
+    const [likesU1, likesU2] = await Promise.all([getLikes(uid1), getLikes(uid2)]);
+    return intersect(likesU1, likesU2);
+};
