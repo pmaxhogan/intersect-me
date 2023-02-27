@@ -15,12 +15,7 @@ export const saveLikes = async (uid: string, liked: GenericSong[]) => {
     const json = JSON.stringify(store);
 
     await file.save(json, {
-        contentType: "application/json", /*
-        metadata: {
-            metadata: {
-                firebaseStorageDownloadTokens: Date.now().toString(),
-            },
-        },*/
+        contentType: "application/json",
     });
 
     console.log(`Array uploaded as JSON to gs://${bucket.name}/${folder}/${filename}`);
