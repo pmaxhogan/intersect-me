@@ -1,9 +1,16 @@
 import Link from 'next/link'
 import {useState} from "react";
-
-// Import the functions you need from the SDKs you need
 import {initializeApp} from "firebase/app";
-import {getAuth, signInWithPopup, GoogleAuthProvider} from "firebase/auth";
+import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
+import BackButton from "../components/BackButton";
+import ResultsStack from "../components/ResultsStack";
+import ForwardButton from "../components/ForwardButton";
+import {Typography} from "@mui/material";
+import ButtonStack from "../components/ButtonStack";
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import RssFeedIcon from '@mui/icons-material/RssFeed';
+import {useRouter} from "next/navigation";
+import useUser from "../hooks/useUser";
 
 type GenericSong = {
     url: string | null;
@@ -39,30 +46,38 @@ const auth = getAuth(app);
 
 
 export default function IndexPage() {
+    const {user, loading, auth} = useUser();
+
     const signIn = async () => {
-        const auth = getAuth();
+        console.log("signing in");
         await signInWithPopup(auth, provider);
     };
 
     const authSpotify = async () => {
-        const token = await auth.currentUser.getIdToken(true);
+        if(user) {
+            const token = await user.getIdToken(true);
 
-        location.href = `/api/spotify-sync?token=${encodeURIComponent(token)}`;
+            location.href = `/api/spotify-sync?token=${encodeURIComponent(token)}`;
+        }
     };
 
     const intersect = async () => {
-        const token = await auth.currentUser.getIdToken(true);
+        if(user) {
+            const token = await user?.getIdToken(true);
 
-        const req = await fetch(`/api/intersect-dummy?username=${encodeURIComponent(username)}&token=${encodeURIComponent(token)}`, {
-            method: "POST",
-        });
-        const res = await req.json() as ApiIntersectResult;
-        console.log(res);
-        setIntersectionResult(res);
+            const req = await fetch(`/api/intersect-dummy?username=${encodeURIComponent(username)}&token=${encodeURIComponent(token)}`, {
+                method: "POST",
+            });
+            const res = await req.json() as ApiIntersectResult;
+            console.log(res);
+            setIntersectionResult(res);
+        }
     }
 
     const [username, setUsername] = useState("");
     const [intersectionResult, setIntersectionResult] = useState(null as ApiIntersectResult | null);
+
+    const router = useRouter();
 
     return (
         <div>
@@ -95,6 +110,19 @@ export default function IndexPage() {
                     ))}
                 </div>
             )}
+            {/*<FluidButton leftIcon={<Avatar sx={{bgcolor: red[500]}}>
+                A
+            </Avatar>} title="a" subtitle="a"/>*/}
+            <ResultsStack elements={[
+                <BackButton onClick={() => console.log("hi")}/>,
+                <ForwardButton onClick={() => console.log("hi")} title={"Forward"}/>,
+                <BackButton onClick={() => console.log("hi")}/>
+            ]}/>
+            <Typography variant={"h2"} component={"h1"}>Link a Service</Typography>
+            <ButtonStack elements={[
+                <ForwardButton leftIcon={<MusicNoteIcon/>} to="/link/apple" title={"Apple Music"}/>,
+                <ForwardButton leftIcon={<RssFeedIcon/>} to="/link/spotify" title={"Spotify"}/>,
+            ]}/>
         </div>
     )
 };

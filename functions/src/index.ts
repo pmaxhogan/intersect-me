@@ -15,12 +15,8 @@ import {intersectUids} from "./intersect.js";
 initializeApp();
 
 const auth = getAuth();
-
 import intersection from "./intersection.json" assert { type: "json" };
-
-
 const app = express();
-
 
 app.get("/api/spotify-sync", async (req, res) => {
     const authKey = req.headers["x-auth-key"] || req.query["token"];
@@ -74,7 +70,7 @@ app.get("/api/redirect", async (req, res) => {
         lastSync: Date.now(),
     });
 
-    res.redirect("/");
+    res.redirect("/link/spotify/library");
 });
 
 app.post("/api/intersect", async (req, res) => {
