@@ -6,7 +6,7 @@ export default function CircularProgressWithLabel(
 ) {
     return (
         <Box sx={{position: 'relative', display: 'inline-flex'}}>
-            <CircularProgress variant="determinate" {...props} />
+            <CircularProgress variant="determinate" size={200} {...props}/>
             <Box
                 sx={{
                     top: 0,
@@ -23,6 +23,7 @@ export default function CircularProgressWithLabel(
                     variant="caption"
                     component="div"
                     color="text.secondary"
+
                 >{`${Math.round(props.value)}%\n${props.extraText ?? ""}`}</Typography>
             </Box>
         </Box>

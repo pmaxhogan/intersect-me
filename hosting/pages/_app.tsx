@@ -3,7 +3,7 @@ import React, {Component} from "react";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import {CssBaseline} from "@mui/material";
 
-export default function MyApp({Component, pageProps} : {Component: Component, pageProps: any}) {
+export default function MyApp({Component, pageProps} : {Component: new() => React.Component<any, any>, pageProps: any}) {
     const themeObj = createTheme({
         palette: {
             mode: "dark"
