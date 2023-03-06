@@ -6,5 +6,5 @@ import {useRouter} from "next/navigation";
 export default function ForwardButton({onClick, title, leftIcon, to}: {onClick: () => void, title: string, leftIcon?: ReactElement, to?: never} | {onClick?: never, title: string, leftIcon?: ReactElement, to: string}) {
     const router = useRouter();
 
-    return to ? <FluidButton leftIcon={leftIcon} title={title} mainAction={() => router.push(to)}/> : <FluidButton leftIcon={leftIcon} title={title} mainAction={onClick}/>;
+    return to ? <FluidButton leftIcon={leftIcon} title={title} mainAction={() => router.push(to)} rightIcon={<ArrowForwardIos/>}/> : <FluidButton leftIcon={leftIcon} title={title} mainAction={onClick} rightIcon={<ArrowForwardIos/>}/>;
 }

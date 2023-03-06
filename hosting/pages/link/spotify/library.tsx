@@ -4,6 +4,7 @@ import useUser from "../../../hooks/useUser";
 import useFirestoreDocument from "../../../hooks/useFirestoreDocument";
 import React, {useEffect} from "react";
 import CircularProgressWithLabel from "../../../components/CircularProgressWithLabel";
+import ForwardButton from "../../../components/ForwardButton";
 
 type UserDocument = {
     count: number;
@@ -46,12 +47,11 @@ export default function Spotify() {
 
     return <div>
         <Typography variant={"h2"} component={"h1"}>Linking Library</Typography>
-        {JSON.stringify(firestoreDoc)}
 
         <CircularProgressWithLabel value={progress / firestoreDoc?.count * 100} extraText={""}/>
 
         {firestoreDoc?.count === progress && <div>
-            <Typography variant={"h2"} component={"h1"}>Done!</Typography>
+            <ForwardButton title={"Continue"} to={"/"}/>
         </div>}
     </div>
 }
