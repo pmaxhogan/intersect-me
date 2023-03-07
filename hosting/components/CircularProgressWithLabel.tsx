@@ -6,7 +6,7 @@ export default function CircularProgressWithLabel(
 ) {
     return (
         <Box sx={{position: 'relative', display: 'inline-flex'}}>
-            <CircularProgress variant="determinate" size={200} {...props}/>
+            <CircularProgress variant="determinate" size={200} value={props.value}/>
             <Box
                 sx={{
                     top: 0,
