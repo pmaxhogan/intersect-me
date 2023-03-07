@@ -70,7 +70,7 @@ app.get("/api/redirect", async (req, res) => {
         lastSync: Date.now(),
     });
 
-    res.redirect("/link/spotify/library");
+    res.redirect("/");
 });
 
 app.post("/api/intersect", async (req, res) => {

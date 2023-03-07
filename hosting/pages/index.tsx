@@ -28,8 +28,8 @@ type ApiIntersectResult = {
     numSongs2: number;
 };
 
-const provider = new GoogleAuthProvider();
 
+// todo: remove
 const firebaseConfig = {
     apiKey: "AIzaSyD69xHBIGVYb4WQ8X3bzgI3mCj4qI7KipI",
     authDomain: "intersect-me.firebaseapp.com",
@@ -47,11 +47,14 @@ const auth = getAuth(app);
 
 export default function IndexPage() {
     const {user, loading, auth} = useUser();
+    const router = useRouter();
 
-    const signIn = async () => {
-        console.log("signing in");
-        await signInWithPopup(auth, provider);
-    };
+    const [username, setUsername] = useState("");
+    const [intersectionResult, setIntersectionResult] = useState(null as ApiIntersectResult | null);
+
+    if(!loading && !user) {
+        router.push("/signin");
+    }
 
     const authSpotify = async () => {
         if(user) {
@@ -74,13 +77,9 @@ export default function IndexPage() {
         }
     }
 
-    const [username, setUsername] = useState("");
-    const [intersectionResult, setIntersectionResult] = useState(null as ApiIntersectResult | null);
-
-    const router = useRouter();
 
     return (
-        <div>
+        <main>
 
             <style jsx>{`
                 .intersection-row {
@@ -90,7 +89,6 @@ export default function IndexPage() {
                 }
             `}</style>
             Hello World. <Link href="/about">About</Link>
-            <button onClick={signIn}>Sign in with Google</button>
             <button onClick={authSpotify}>Link spotify</button>
             <input type="text" placeholder="username" onChange={(e) => setUsername(e.target.value)} value={username}/>
             <button onClick={intersect}>Intersect</button>
@@ -123,6 +121,6 @@ export default function IndexPage() {
                 <ForwardButton leftIcon={<MusicNoteIcon/>} to="/link/apple" title={"Apple Music"}/>,
                 <ForwardButton leftIcon={<RssFeedIcon/>} to="/link/spotify" title={"Spotify"}/>,
             ]}/>
-        </div>
+        </main>
     )
 };
