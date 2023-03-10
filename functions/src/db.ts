@@ -40,26 +40,25 @@ export const getLikes = async (uid: string): Promise<GenericSong[]> => {
     return result.liked;
 };
 
-export const updateMeta = async (uid: string, count: UserMeta) => {
+export const updateMeta = async (uid: string, document: UserMeta) => {
     const db = getFirestore();
     const doc = db.collection("users").doc(uid);
     const meta = await doc.get();
     if (!meta.exists) {
-        await doc.set(count);
+        await doc.set(document);
     } else {
-        await doc.update(count);
+        await doc.update(document);
     }
 };
 
 export const usernameToUid = async (username: string): Promise<string> => {
     const db = getFirestore();
-    const doc = db.collection("users").where("username", "==", username).limit(1);
+    const doc = db.collection("users").where("username", "==", username.toLowerCase()).limit(1);
     const meta = await doc.get();
     if (!meta.size) {
         throw new Error("Username not found");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return meta.docs[0].id;
 };
 

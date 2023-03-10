@@ -6,10 +6,10 @@ import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import useUser from "../../../hooks/useUser";
 
 export default function Spotify() {
-    const {user, loading, auth} = useUser();
+    const {user} = useUser();
 
     const linkLibrary = async () => {
-        if(user) {
+        if (user) {
             const token = await user.getIdToken(true);
 
             location.href = `/api/spotify-sync?token=${encodeURIComponent(token)}`;

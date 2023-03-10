@@ -1,5 +1,4 @@
-import {GoogleAuthProvider, GithubAuthProvider, signInWithPopup} from "firebase/auth";
-import useAuth from "../hooks/useAuth";
+import {GithubAuthProvider, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 import GoogleIcon from '@mui/icons-material/Google';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import {Typography} from "@mui/material";
@@ -8,11 +7,11 @@ import useUser from "../hooks/useUser";
 import {useRouter} from "next/router";
 import ButtonStack from "../components/ButtonStack";
 
-export default function SigninPage(){
+export default function SigninPage() {
     const {user, loading: userLoading, auth} = useUser();
     const router = useRouter();
 
-    if(user && !userLoading) {
+    if (user && !userLoading) {
         router.push("/");
     }
 
@@ -24,7 +23,7 @@ export default function SigninPage(){
         await signInWithPopup(auth, new GithubAuthProvider());
     };
 
-    if(userLoading) return <main>Loading...</main>;// todo: make this look better
+    if (userLoading) return <main>Loading...</main>;// todo: make this look better
 
     return <main>
         <ButtonStack elements={[

@@ -1,9 +1,5 @@
-import Link from 'next/link'
 import {useState} from "react";
 import {initializeApp} from "firebase/app";
-import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
-import BackButton from "../components/BackButton";
-import ResultsStack from "../components/ResultsStack";
 import ForwardButton from "../components/ForwardButton";
 import {Typography} from "@mui/material";
 import ButtonStack from "../components/ButtonStack";
@@ -40,32 +36,22 @@ const firebaseConfig = {
     measurementId: "G-VB1Y72TB5L"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+initializeApp(firebaseConfig);
 
 
 export default function IndexPage() {
-    const {user, loading, auth} = useUser();
+    const {user, loading} = useUser();
     const router = useRouter();
 
     const [username, setUsername] = useState("");
     const [intersectionResult, setIntersectionResult] = useState(null as ApiIntersectResult | null);
 
-    if(!loading && !user) {
+    if (!loading && !user) {
         router.push("/signin");
     }
 
-    const authSpotify = async () => {
-        if(user) {
-            const token = await user.getIdToken(true);
-
-            location.href = `/api/spotify-sync?token=${encodeURIComponent(token)}`;
-        }
-    };
-
     const intersect = async () => {
-        if(user) {
+        if (user) {
             const token = await user?.getIdToken(true);
 
             const req = await fetch(`/api/intersect-dummy?username=${encodeURIComponent(username)}&token=${encodeURIComponent(token)}`, {
@@ -82,14 +68,12 @@ export default function IndexPage() {
         <main>
 
             <style jsx>{`
-                .intersection-row {
-                    display: flex;
-                    width: 300px;
-                    justify-content: space-between;
-                }
+              .intersection-row {
+                display: flex;
+                width: 300px;
+                justify-content: space-between;
+              }
             `}</style>
-            Hello World. <Link href="/about">About</Link>
-            <button onClick={authSpotify}>Link spotify</button>
             <input type="text" placeholder="username" onChange={(e) => setUsername(e.target.value)} value={username}/>
             <button onClick={intersect}>Intersect</button>
             {intersectionResult && (
@@ -108,14 +92,6 @@ export default function IndexPage() {
                     ))}
                 </div>
             )}
-            {/*<FluidButton leftIcon={<Avatar sx={{bgcolor: red[500]}}>
-                A
-            </Avatar>} title="a" subtitle="a"/>*/}
-            <ResultsStack elements={[
-                <BackButton onClick={() => console.log("hi")}/>,
-                <ForwardButton onClick={() => console.log("hi")} title={"Forward"}/>,
-                <BackButton onClick={() => console.log("hi")}/>
-            ]}/>
             <Typography variant={"h2"} component={"h1"}>Link a Service</Typography>
             <ButtonStack elements={[
                 <ForwardButton leftIcon={<MusicNoteIcon/>} to="/link/apple" title={"Apple Music"}/>,
