@@ -7,7 +7,7 @@ import {getLikedSongs, getSpotifyApi} from "./spotify.js";
 import {decrypt, encrypt} from "./crypto.js";
 import {getAuth} from "firebase-admin/auth";
 import {initializeApp} from "firebase-admin/app";
-import {saveLikes, updateMeta, usernameToUid} from "./db.js";
+import {getLikes, saveLikes, updateMeta, usernameToUid} from "./db.js";
 import {intersectUids} from "./intersect.js";
 import intersection from "./intersection.json" assert {type: "json"};
 
@@ -109,6 +109,14 @@ app.post("/api/intersect", authenticate as never, async (req, res) => {
     console.log(intersections);
 
     res.json(intersections);
+});
+
+app.get("/api/my-songs", authenticate as never, async (req, res) => {
+    const {uid} = (req as AuthenticatedRequest).user;
+    console.log("uid", uid);
+
+    const songs = await getLikes(uid);
+    res.json({songs});
 });
 
 app.post("/api/intersect-dummy", async (req, res) => {

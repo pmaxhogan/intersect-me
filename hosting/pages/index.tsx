@@ -7,22 +7,8 @@ import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import RssFeedIcon from '@mui/icons-material/RssFeed';
 import {useRouter} from "next/navigation";
 import useUser from "../hooks/useUser";
-
-type GenericSong = {
-    url: string | null;
-    albumArt: string;
-    providerId: string;
-    name: string;
-    artist: string;
-    lengthSeconds: number;
-    provider: "apple" | "spotify";
-};
-
-type ApiIntersectResult = {
-    intersection: GenericSong[][];
-    numSongs1: number;
-    numSongs2: number;
-};
+import {ApiIntersectResult, GenericSong, GetSongsResult} from "../types/api";
+import SongsResults from "../components/SongsResults";
 
 
 // todo: remove
@@ -45,6 +31,7 @@ export default function IndexPage() {
 
     const [username, setUsername] = useState("");
     const [intersectionResult, setIntersectionResult] = useState(null as ApiIntersectResult | null);
+    const [mySongs, setMySongs] = useState(null as GenericSong[] | null);
 
     if (!loading && !user) {
         router.push("/signin");
@@ -54,19 +41,34 @@ export default function IndexPage() {
         if (user) {
             const token = await user?.getIdToken(true);
 
-            const req = await fetch(`/api/intersect-dummy?username=${encodeURIComponent(username)}&token=${encodeURIComponent(token)}`, {
+            const req = await fetch(`/api/intersect-dummy?username=${encodeURIComponent(username)}`, {
                 method: "POST",
+                headers: {
+                    "x-auth-key": await user.getIdToken(),
+                }
             });
             const res = await req.json() as ApiIntersectResult;
             console.log(res);
             setIntersectionResult(res);
         }
-    }
+    };
 
+    const getSongs = async () => {
+        if (user) {
+            const token = await user?.getIdToken(true);
+
+            const req = await fetch(`/api/my-songs`, {
+                headers: {
+                    "x-auth-key": await user.getIdToken(),
+                }
+            });
+            const {songs} = await req.json() as GetSongsResult;
+            setMySongs(songs);
+        }
+    };
 
     return (
         <main>
-
             <style jsx>{`
               .intersection-row {
                 display: flex;
@@ -76,22 +78,9 @@ export default function IndexPage() {
             `}</style>
             <input type="text" placeholder="username" onChange={(e) => setUsername(e.target.value)} value={username}/>
             <button onClick={intersect}>Intersect</button>
-            {intersectionResult && (
-                <div className={"intersection-result"}>
-                    {intersectionResult.intersection.map((songs, i) => (
-                        <div key={i} className={"intersection-row"}>
-                            {songs.map((song, j) => (
-                                <div key={j}>
-                                    <img src={song.albumArt} width={100} height={100}
-                                         alt={song.name + " by " + song.artist}/>
-                                    <p>{song.name}</p>
-                                    <p>{song.artist}</p>
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </div>
-            )}
+            {intersectionResult && <SongsResults songs={intersectionResult.intersection.map(x => x[0])}/>}
+            <button onClick={getSongs}>Songs</button>
+            {mySongs && <SongsResults songs={mySongs}/>}
             <Typography variant={"h2"} component={"h1"}>Link a Service</Typography>
             <ButtonStack elements={[
                 <ForwardButton leftIcon={<MusicNoteIcon/>} to="/link/apple" title={"Apple Music"}/>,
