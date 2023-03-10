@@ -1,4 +1,3 @@
-import useFirebaseApp from "./useFirebaseApp";
 import useFirestore from "./useFirestore";
 import {useEffect, useState} from "react";
 import {doc, DocumentSnapshot, Firestore, onSnapshot} from "firebase/firestore";
@@ -6,12 +5,12 @@ import {FirebaseError} from "@firebase/util";
 import useUser from "./useUser";
 
 
-export default function useFirestoreDocument(collection: string, id: string|null) {
+export default function useFirestoreDocument(collection: string, id: string | null) {
     const firestore: Firestore = useFirestore();
     const {user, loading: userLoading, auth} = useUser();
     const [firestoreDoc, setFirestoreDoc] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<FirebaseError|null>(null);
+    const [error, setError] = useState<FirebaseError | null>(null);
 
 
     useEffect(() => {
@@ -20,7 +19,7 @@ export default function useFirestoreDocument(collection: string, id: string|null
             setFirestoreDoc(null);
             setLoading(false);
             return;
-        }else {
+        } else {
             return onSnapshot(doc(firestore, collection, id), (snap: DocumentSnapshot<any>) => {
                 setFirestoreDoc(snap.data());
                 setLoading(false);

@@ -14,5 +14,5 @@ export default function useUser() {
         });
     }, []);
 
-    return { user, loading, auth };
+    return {user, loading, auth};
 }
