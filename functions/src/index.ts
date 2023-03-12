@@ -5,14 +5,16 @@ import express from "express";
 import {getLikedSongs, getSpotifyApi} from "./util/spotify.js";
 import {decrypt, encrypt} from "./util/crypto.js";
 import {getAuth} from "firebase-admin/auth";
-import {getLikes, saveLikes, updateMeta, usernameToUid} from "./util/db.js";
+import {getLikes, getUserDoc, saveLikes, uidToUsername, updateMeta, usernameToUid} from "./util/db.js";
 import {intersectUids} from "./util/intersect.js";
 import intersection from "./intersection.json" assert {type: "json"};
 
 import authenticate, {AuthenticatedRequest} from "./util/authenticate.js";
-import {validateUsername} from "./util/validateUsername";
+import {validateUsername} from "./util/validateUsername.js";
 
 setup();
+
+const MAX_UIDS = 10000;
 
 
 const auth = getAuth();
@@ -101,6 +103,52 @@ app.get("/api/my-songs", authenticate, async (req, res) => {
 
 app.post("/api/intersect-dummy", async (req, res) => {
     res.json(intersection);
+});
+
+app.get("/api/lookup-uids", authenticate, async (req, res) => {
+    const uids = req.query["uids"];
+    if (typeof uids !== "string") {
+        res.send("error");
+        return;
+    }
+    const split = uids.split(",");
+    if (split.length === 0 || split.length > MAX_UIDS) {
+        res.send("error");
+        return;
+    }
+
+    // convert to usernames
+    const usernames = await Promise.all(split.map(async (uid) => {
+        const username = await uidToUsername(uid);
+        return [uid, username];
+    }));
+    res.json({usernames: Object.fromEntries(usernames)});
+});
+
+app.post("/api/add-following", authenticate, async (req, res) => {
+    const newFollowing = req.query["following"];
+    functions.logger.log("newFollowing", newFollowing);
+    if (typeof newFollowing !== "string" || !validateUsername(newFollowing)) {
+        functions.logger.log("invalid username");
+        res.send("error");
+        return;
+    }
+    const newFollowingUid = await usernameToUid(newFollowing);
+
+    const {uid} = (req as AuthenticatedRequest).user;
+    const doc = await getUserDoc(uid);
+    const following = doc?.following || [];
+
+    if (following.includes(newFollowing)) {
+        res.send("ok");
+        return;
+    }
+
+    following.push(newFollowingUid);
+
+    await updateMeta(uid, {
+        following,
+    });
 });
 
 app.post("/api/update-username", authenticate, async (req, res) => {

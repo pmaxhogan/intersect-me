@@ -17,3 +17,21 @@ export interface ApiIntersectResult {
 export interface GetSongsResult {
     songs: GenericSong[];
 }
+
+export type uid = string;
+export type username = string;
+
+export type UserMeta = {
+    username?: string;
+    count?: number;
+    lastSync?: number;
+    following?: uid[];
+};
+
+export type LookupUidsResult = {
+    usernames: UsernamesMap
+}
+
+export type UsernamesMap = {
+    [uid: string]: username;
+};

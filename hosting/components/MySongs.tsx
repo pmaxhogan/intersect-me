@@ -4,25 +4,21 @@ import {GenericSong, GetSongsResult} from "../types/api";
 import Typography from "@mui/material/Typography";
 import useUser from "../hooks/useUser";
 import SongsResults from "./SongsResults";
+import useFetchWithAuth from "../hooks/useFetchWithAuth";
 
 
 export default function MySongs() {
     const router = useRouter();
     const {user, loading} = useUser();
     const [mySongs, setMySongs] = useState(null as GenericSong[] | null);
+    const fetchWithAuth = useFetchWithAuth();
 
     const [search, setSearch] = React.useState("");
 
     useEffect(() => {
         (async () => {
             if (user) {
-                const token = await user?.getIdToken(true);
-
-                const req = await fetch(`/api/my-songs`, {
-                    headers: {
-                        "x-auth-key": await user.getIdToken(),
-                    }
-                });
+                const req = await fetchWithAuth(`/api/my-songs`);
                 const {songs} = await req.json() as GetSongsResult;
                 setMySongs(songs);
             }

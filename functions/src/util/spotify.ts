@@ -14,8 +14,8 @@ const spotifyApi = getSpotifyApi();
 spotifyApi.setAccessToken(process.env.SPOTIFY_TOKEN as string);
 
 
-const scopes = "user-library-read user-follow-read playlist-read-private playlist-read-collaborative user-top-read user-read-recently-played".split(" ");
-console.log(spotifyApi.createAuthorizeURL(scopes, "state"));
+// const scopes = "user-library-read user-follow-read playlist-read-private playlist-read-collaborative user-top-read user-read-recently-played".split(" ");
+// console.log(spotifyApi.createAuthorizeURL(scopes, "state"));
 
 const fetchAllPages = async <T>(apiCall: fetchApiCallback<T>): Promise<T[]> => {
     const items = [];

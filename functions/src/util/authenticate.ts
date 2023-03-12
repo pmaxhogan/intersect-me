@@ -19,7 +19,7 @@ export type AuthenticatedRequest = Request & { user: DecodedIdToken };
 const authenticate: RequestHandler = async function (req: AuthenticatedRequest, res: Response, next: NextFunction) {
     const authKey = req.headers["x-auth-key"] || req.query["token"];
     if (typeof authKey !== "string") {
-        res.send("error");
+        res.status(401).send("error");
         return;
     }
     req.user = await auth.verifyIdToken(authKey);

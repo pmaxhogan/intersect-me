@@ -1,6 +1,7 @@
 import GenericSong from "../types/genericSong";
 import {getStorage} from "firebase-admin/storage";
 import {getFirestore} from "firebase-admin/firestore";
+import {validateUsername} from "./validateUsername.js";
 
 export const saveLikes = async (uid: string, liked: GenericSong[]) => {
     const storage = getStorage();
@@ -52,6 +53,9 @@ export const updateMeta = async (uid: string, document: UserMeta) => {
 };
 
 export const usernameToUid = async (username: string): Promise<string> => {
+    if (!validateUsername(username)) {
+        throw new Error("Invalid username");
+    }
     const db = getFirestore();
     const doc = db.collection("users").where("username", "==", username.toLowerCase()).limit(1);
     const meta = await doc.get();
@@ -60,6 +64,21 @@ export const usernameToUid = async (username: string): Promise<string> => {
     }
 
     return meta.docs[0].id;
+};
+
+export const getUserDoc = async (uid: string): Promise<UserMeta | undefined> => {
+    const db = getFirestore();
+    const doc = db.collection("users").doc(uid);
+    const meta = await doc.get();
+    if (!meta.exists) {
+        throw new Error("User not found");
+    }
+
+    return meta?.data();
+};
+
+export const uidToUsername = async (uid: string): Promise<string | undefined> => {
+    return (await getUserDoc(uid))?.username;
 };
 
 type uid = string;

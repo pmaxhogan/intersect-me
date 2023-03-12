@@ -10,6 +10,8 @@ import useUser from "../hooks/useUser";
 import {ApiIntersectResult} from "../types/api";
 import SongsResults from "../components/SongsResults";
 import MySongs from "../components/MySongs";
+import MyFollowing from "../components/MyFollowing";
+import useFetchWithAuth from "../hooks/useFetchWithAuth";
 
 
 // todo: remove
@@ -29,6 +31,7 @@ initializeApp(firebaseConfig);
 export default function IndexPage() {
     const {user, loading} = useUser();
     const router = useRouter();
+    const fetchWithAuth = useFetchWithAuth();
 
     const [username, setUsername] = useState("");
     const [intersectionResult, setIntersectionResult] = useState(null as ApiIntersectResult | null);
@@ -39,13 +42,8 @@ export default function IndexPage() {
 
     const intersect = async () => {
         if (user) {
-            const token = await user?.getIdToken(true);
-
-            const req = await fetch(`/api/intersect-dummy?username=${encodeURIComponent(username)}`, {
-                method: "POST",
-                headers: {
-                    "x-auth-key": await user.getIdToken(),
-                }
+            const req = await fetchWithAuth(`/api/intersect-dummy?username=${encodeURIComponent(username)}`, {
+                method: "POST"
             });
             const res = await req.json() as ApiIntersectResult;
             console.log(res);
@@ -62,6 +60,7 @@ export default function IndexPage() {
                 justify-content: space-between;
               }
             `}</style>
+            <MyFollowing/>
             <input type="text" placeholder="username" onChange={(e) => setUsername(e.target.value)} value={username}/>
             <button onClick={intersect}>Intersect</button>
             {intersectionResult && <SongsResults songs={intersectionResult.intersection.map(x => x[0])}/>}
