@@ -12,14 +12,12 @@ import UsernameEditor from "../components/UsernameEditor";
 import HomeIcon from '@mui/icons-material/Home';
 import {useRouter} from "next/router";
 
-export default function MyApp({
-                                  Component,
-                                  pageProps
-                              }: { Component: new() => React.Component<any, any>, pageProps: any }) {
-    const {auth, user} = useUser();
-
+export default function MyApp(
+    {Component, pageProps}:
+        { Component: new() => React.Component<any, any>, pageProps: any }
+) {
+    const {auth, user, loading} = useUser();
     const router = useRouter();
-
     const themeObj = createTheme({
         palette: {
             mode: "dark"
@@ -48,6 +46,10 @@ export default function MyApp({
     const logout = async () => {
         await auth.signOut();
     };
+
+    if (!loading && !user && router.pathname !== "/signin") {
+        router.push("/signin");
+    }
 
     return <ThemeProvider theme={themeObj}>
         <AppBar position="static">

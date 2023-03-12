@@ -1,14 +1,11 @@
-import React, {useState} from "react";
+import React from "react";
 import {initializeApp} from "firebase/app";
 import ForwardButton from "../components/ForwardButton";
 import {Typography} from "@mui/material";
 import ButtonStack from "../components/ButtonStack";
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import RssFeedIcon from '@mui/icons-material/RssFeed';
-import {useRouter} from "next/navigation";
 import useUser from "../hooks/useUser";
-import {ApiIntersectResult} from "../types/api";
-import SongsResults from "../components/SongsResults";
 import MySongs from "../components/MySongs";
 import MyFollowing from "../components/MyFollowing";
 import useFetchWithAuth from "../hooks/useFetchWithAuth";
@@ -30,26 +27,9 @@ initializeApp(firebaseConfig);
 
 export default function IndexPage() {
     const {user, loading} = useUser();
-    const router = useRouter();
     const fetchWithAuth = useFetchWithAuth();
 
-    const [username, setUsername] = useState("");
-    const [intersectionResult, setIntersectionResult] = useState(null as ApiIntersectResult | null);
 
-    if (!loading && !user) {
-        router.push("/signin");
-    }
-
-    const intersect = async () => {
-        if (user) {
-            const req = await fetchWithAuth(`/api/intersect-dummy?username=${encodeURIComponent(username)}`, {
-                method: "POST"
-            });
-            const res = await req.json() as ApiIntersectResult;
-            console.log(res);
-            setIntersectionResult(res);
-        }
-    };
 
     return (
         <main>
@@ -61,9 +41,6 @@ export default function IndexPage() {
               }
             `}</style>
             <MyFollowing/>
-            <input type="text" placeholder="username" onChange={(e) => setUsername(e.target.value)} value={username}/>
-            <button onClick={intersect}>Intersect</button>
-            {intersectionResult && <SongsResults songs={intersectionResult.intersection.map(x => x[0])}/>}
             <MySongs/>
             <Typography variant={"h2"} component={"h1"}>Link a Service</Typography>
             <ButtonStack elements={[
