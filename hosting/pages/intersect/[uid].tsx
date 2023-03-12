@@ -24,7 +24,7 @@ export default function IntersectUid() {
             const result = await (await fetchWithAuth(`/api/lookup-uids?uids=${uid}`)).json() as LookupUidsResult;
             setUsername(result.usernames[uid] || "Unknown Username");
 
-            const req = await fetchWithAuth(`/api/intersect-dummy?username=${encodeURIComponent(username)}`, {
+            const req = await fetchWithAuth(`/api/intersect?username=${encodeURIComponent(username)}`, {
                 method: "POST"
             });
             const res = await req.json() as ApiIntersectResult;

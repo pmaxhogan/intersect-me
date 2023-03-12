@@ -7,7 +7,6 @@ import {decrypt, encrypt} from "./util/crypto.js";
 import {getAuth} from "firebase-admin/auth";
 import {getLikes, getUserDoc, saveLikes, uidToUsername, updateMeta, usernameToUid} from "./util/db.js";
 import {intersectUids} from "./util/intersect.js";
-import intersection from "./intersection.json" assert {type: "json"};
 
 import authenticate, {AuthenticatedRequest} from "./util/authenticate.js";
 import {validateUsername} from "./util/validateUsername.js";
@@ -99,10 +98,6 @@ app.get("/api/my-songs", authenticate, async (req, res) => {
 
     const songs = await getLikes(uid);
     res.json({songs});
-});
-
-app.post("/api/intersect-dummy", async (req, res) => {
-    res.json(intersection);
 });
 
 app.get("/api/lookup-uids", authenticate, async (req, res) => {
