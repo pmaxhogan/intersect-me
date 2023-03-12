@@ -1,7 +1,7 @@
 import {config} from "dotenv";
 
 import SpotifyWebApi from "spotify-web-api-node";
-import GenericSong from "./genericSong";
+import GenericSong from "./types/genericSong";
 
 config();
 

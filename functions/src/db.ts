@@ -1,4 +1,4 @@
-import GenericSong from "./genericSong";
+import GenericSong from "./types/genericSong";
 import {getStorage} from "firebase-admin/storage";
 import {getFirestore} from "firebase-admin/firestore";
 
