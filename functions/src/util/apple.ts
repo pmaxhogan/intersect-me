@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import GenericSong from "./types/genericSong";
+import GenericSong from "../types/genericSong";
 
 const extractItems = (response: ApplePage): AppleSong[] => {
     const lib = response.resources["library-songs"];

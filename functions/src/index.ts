@@ -1,21 +1,19 @@
-import {config} from "dotenv";
 import * as functions from "firebase-functions";
 import SpotifyWebApi from "spotify-web-api-node";
-
-import express, {Request, Response, NextFunction} from "express";
-import {getLikedSongs, getSpotifyApi} from "./spotify.js";
-import {decrypt, encrypt} from "./crypto.js";
+import setup from "./util/setup.js";
+import express from "express";
+import {getLikedSongs, getSpotifyApi} from "./util/spotify.js";
+import {decrypt, encrypt} from "./util/crypto.js";
 import {getAuth} from "firebase-admin/auth";
-import {initializeApp} from "firebase-admin/app";
-import {getLikes, saveLikes, updateMeta, usernameToUid} from "./db.js";
-import {intersectUids} from "./intersect.js";
+import {getLikes, saveLikes, updateMeta, usernameToUid} from "./util/db.js";
+import {intersectUids} from "./util/intersect.js";
 import intersection from "./intersection.json" assert {type: "json"};
 
-import {DecodedIdToken} from "firebase-admin/lib/auth/token-verifier";
+import authenticate, {AuthenticatedRequest} from "./util/authenticate.js";
+import {validateUsername} from "./util/validateUsername";
 
-config();
+setup();
 
-initializeApp();
 
 const auth = getAuth();
 const app = express();
@@ -75,25 +73,7 @@ app.get("/api/redirect", async (req, res) => {
     res.redirect("/");
 });
 
-type AuthenticatedRequest = Request & { user: DecodedIdToken };
-
-/**
- * Middleware to authenticate a request
- * @param {AuthenticatedRequest} req request
- * @param {Response} res response
- * @param {NextFunction} next next function
- */
-async function authenticate(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-    const authKey = req.headers["x-auth-key"] || req.query["token"];
-    if (typeof authKey !== "string") {
-        res.send("error");
-        return;
-    }
-    req.user = await auth.verifyIdToken(authKey);
-    next();
-}
-
-app.post("/api/intersect", authenticate as never, async (req, res) => {
+app.post("/api/intersect", authenticate, async (req, res) => {
     const username = req.query["username"];
     if (typeof username !== "string") {
         res.send("error");
@@ -111,7 +91,7 @@ app.post("/api/intersect", authenticate as never, async (req, res) => {
     res.json(intersections);
 });
 
-app.get("/api/my-songs", authenticate as never, async (req, res) => {
+app.get("/api/my-songs", authenticate, async (req, res) => {
     const {uid} = (req as AuthenticatedRequest).user;
     console.log("uid", uid);
 
@@ -123,10 +103,7 @@ app.post("/api/intersect-dummy", async (req, res) => {
     res.json(intersection);
 });
 
-// TODO: validate username
-const validateUsername = (username: string) => username.length > 0 && username.length < 20;
-
-app.post("/api/update-username", authenticate as never, async (req, res) => {
+app.post("/api/update-username", authenticate, async (req, res) => {
     const username = req.query["username"];
     if (typeof username !== "string" || !validateUsername(username)) {
         res.send({status: "error", message: "Invalid username"});

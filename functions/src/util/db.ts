@@ -1,4 +1,4 @@
-import GenericSong from "./types/genericSong";
+import GenericSong from "../types/genericSong";
 import {getStorage} from "firebase-admin/storage";
 import {getFirestore} from "firebase-admin/firestore";
 
@@ -62,10 +62,13 @@ export const usernameToUid = async (username: string): Promise<string> => {
     return meta.docs[0].id;
 };
 
+type uid = string;
+
 type UserMeta = {
     username?: string;
     count?: number;
     lastSync?: number;
+    following?: uid[];
 };
 
 type LikedSongsStore = {

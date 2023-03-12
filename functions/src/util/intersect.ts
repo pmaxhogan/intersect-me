@@ -1,4 +1,4 @@
-import type GenericSong from "./types/genericSong";
+import type GenericSong from "../types/genericSong";
 import {getLikes} from "./db.js";
 
 // ew
