@@ -1,6 +1,6 @@
 
 
-interface offsetOpts {
+export interface offsetOpts {
     offset: number;
 }
 
@@ -27,6 +27,6 @@ export interface SavedTrackObject {
     };
 }
 
-interface Artists {
+export interface Artists {
     name: string
 }

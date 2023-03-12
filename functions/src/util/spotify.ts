@@ -2,6 +2,7 @@ import {config} from "dotenv";
 
 import SpotifyWebApi from "spotify-web-api-node";
 import GenericSong from "../types/genericSong";
+import {Artists, fetchApiCallback, offsetOpts, SavedTrackObject} from "../types/spotifySong";
 
 config();
 
