@@ -23,12 +23,12 @@ export default function IndexPage() {
               }
             `}</style>
             <MyFollowing/>
-            <MySongs/>
             <Typography variant={"h2"} component={"h1"}>Link a Service</Typography>
             <ButtonStack elements={[
                 <ForwardButton leftIcon={<MusicNoteIcon/>} to="/link/apple" title={"Apple Music"}/>,
                 <ForwardButton leftIcon={<RssFeedIcon/>} to="/link/spotify" title={"Spotify"}/>,
             ]}/>
+            <MySongs/>
         </main>
     )
 };

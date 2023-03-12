@@ -75,19 +75,15 @@ app.get("/api/redirect", async (req, res) => {
 });
 
 app.post("/api/intersect", authenticate, async (req, res) => {
-    const username = req.query["username"];
-    if (typeof username !== "string") {
+    const destUid = req.query["uid"];
+    if (typeof destUid !== "string") {
         res.send("error");
         return;
     }
 
-    const {uid} = (req as AuthenticatedRequest).user;
-    console.log("uid", uid);
-    const uid2 = await usernameToUid(username);
+    const {uid: myUid} = (req as AuthenticatedRequest).user;
 
-    const intersections = await intersectUids(uid, uid2);
-
-    console.log(intersections);
+    const intersections = await intersectUids(myUid, destUid);
 
     res.json(intersections);
 });
@@ -128,7 +124,15 @@ app.post("/api/add-following", authenticate, async (req, res) => {
         res.send("error");
         return;
     }
-    const newFollowingUid = await usernameToUid(newFollowing);
+    let newFollowingUid;
+
+    try {
+        newFollowingUid = await usernameToUid(newFollowing);
+    } catch (e) {
+        res.status(404);
+        res.send("error");
+        return;
+    }
 
     const {uid} = (req as AuthenticatedRequest).user;
     const doc = await getUserDoc(uid);

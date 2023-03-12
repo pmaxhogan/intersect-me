@@ -71,7 +71,8 @@ export const getUserDoc = async (uid: string): Promise<UserMeta | undefined> => 
     const doc = db.collection("users").doc(uid);
     const meta = await doc.get();
     if (!meta.exists) {
-        throw new Error("User not found");
+        await updateMeta(uid, {});
+        return {};
     }
 
     return meta?.data();
