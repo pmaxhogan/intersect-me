@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import {initializeApp} from "firebase/app";
 import ForwardButton from "../components/ForwardButton";
 import {Typography} from "@mui/material";
@@ -7,8 +7,9 @@ import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import RssFeedIcon from '@mui/icons-material/RssFeed';
 import {useRouter} from "next/navigation";
 import useUser from "../hooks/useUser";
-import {ApiIntersectResult, GenericSong, GetSongsResult} from "../types/api";
+import {ApiIntersectResult} from "../types/api";
 import SongsResults from "../components/SongsResults";
+import MySongs from "../components/MySongs";
 
 
 // todo: remove
@@ -31,7 +32,6 @@ export default function IndexPage() {
 
     const [username, setUsername] = useState("");
     const [intersectionResult, setIntersectionResult] = useState(null as ApiIntersectResult | null);
-    const [mySongs, setMySongs] = useState(null as GenericSong[] | null);
 
     if (!loading && !user) {
         router.push("/signin");
@@ -53,20 +53,6 @@ export default function IndexPage() {
         }
     };
 
-    const getSongs = async () => {
-        if (user) {
-            const token = await user?.getIdToken(true);
-
-            const req = await fetch(`/api/my-songs`, {
-                headers: {
-                    "x-auth-key": await user.getIdToken(),
-                }
-            });
-            const {songs} = await req.json() as GetSongsResult;
-            setMySongs(songs);
-        }
-    };
-
     return (
         <main>
             <style jsx>{`
@@ -79,8 +65,7 @@ export default function IndexPage() {
             <input type="text" placeholder="username" onChange={(e) => setUsername(e.target.value)} value={username}/>
             <button onClick={intersect}>Intersect</button>
             {intersectionResult && <SongsResults songs={intersectionResult.intersection.map(x => x[0])}/>}
-            <button onClick={getSongs}>Songs</button>
-            {mySongs && <SongsResults songs={mySongs}/>}
+            <MySongs/>
             <Typography variant={"h2"} component={"h1"}>Link a Service</Typography>
             <ButtonStack elements={[
                 <ForwardButton leftIcon={<MusicNoteIcon/>} to="/link/apple" title={"Apple Music"}/>,
