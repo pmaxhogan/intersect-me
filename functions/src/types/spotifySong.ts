@@ -4,7 +4,7 @@ interface offsetOpts {
     offset: number;
 }
 
-type fetchApiCallback<T> = (arg0?: offsetOpts) => Promise<{
+export type fetchApiCallback<T> = (arg0?: offsetOpts) => Promise<{
     body: {
         items: T[],
         next: string | null,
@@ -12,11 +12,11 @@ type fetchApiCallback<T> = (arg0?: offsetOpts) => Promise<{
     }
 }>;
 
-interface SavedTrackObject {
+export interface SavedTrackObject {
     track: {
         href: string;
         album: {
-            images: {url: string}[];
+            images: { url: string }[];
         };
         id: string;
         name: string;

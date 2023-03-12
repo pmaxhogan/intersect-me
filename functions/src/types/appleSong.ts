@@ -1,4 +1,4 @@
-type AppleSong = {
+export type AppleSong = {
     id: string;
     type: string;
     href: string;
@@ -30,8 +30,8 @@ type AppleSong = {
     };
 }
 
-type ApplePage = {
-    data: {id: string }[];
+export type ApplePage = {
+    data: { id: string }[];
     meta: {
         total: number,
     };
