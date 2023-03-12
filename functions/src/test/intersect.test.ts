@@ -190,7 +190,7 @@ test("artist attribution can differ between providers", () => {
         "name": "Aria Math (Protostar Remix)",
         "artist": "C418 & Protostar",
         "provider": "apple",
-    } as GenericSong)).toBeFalsy();
+    } as GenericSong)).toBeTruthy();
 });
 
 test("remasters and year mixes are the same", () => {
@@ -280,12 +280,14 @@ test("artist order does not matter", () => {
         "name": "Aftershock",
         "artist": "NGHTMRE & Boombox Cartel",
         "provider": "apple",
+        "lengthSeconds": 200,
     } as GenericSong, {
         "providerId": "2345",
         "name": "Aftershock - Boombox Cartel",
         "artist": "Boombox Cartel & NGHTMRE",
         "artistList": ["Boombox Cartel", "NGHTMRE"],
         "provider": "spotify",
+        "lengthSeconds": 200,
     } as GenericSong)).toBeTruthy();
 });
 
