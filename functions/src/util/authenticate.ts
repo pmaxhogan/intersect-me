@@ -16,7 +16,7 @@ export type AuthenticatedRequest = Request & { user: DecodedIdToken };
  * @param {Response} res response
  * @param {NextFunction} next next function
  */
-const authenticate: RequestHandler = async function (req: AuthenticatedRequest, res: Response, next: NextFunction) {
+const authenticate: RequestHandler = async function authenticate(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     const authKey = req.headers["x-auth-key"] || req.query["token"];
     if (typeof authKey !== "string") {
         res.status(401).send("error");
