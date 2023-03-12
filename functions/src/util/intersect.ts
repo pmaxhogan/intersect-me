@@ -3,13 +3,17 @@ import {getLikes} from "./db.js";
 import {compareSongs} from "./compareSongs.js";
 
 export const intersect = (songs: GenericSong[], songs2: GenericSong[]): GenericSong[][] => {
-    console.log(songs);
+    const usedSong1s = new Set();
+    const usedSong2s = new Set();
+
     const intersectedSongs: GenericSong[][] = [];
     songs2.forEach((song2) => {
         let found = false;
         songs.forEach((song) => {
-            if (!found && compareSongs(song, song2)) {
+            if (!found && compareSongs(song, song2) && !usedSong1s.has(song.url) && !usedSong2s.has(song2.url)) {
                 intersectedSongs.push([song, song2]);
+                usedSong1s.add(song.url);
+                usedSong2s.add(song2.url);
                 found = true;
             }
         });

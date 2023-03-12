@@ -38,7 +38,5 @@ export function compareSongs(song: GenericSong, song2: GenericSong) {
 
     const commonArtists = atLeast1InCommon(getArtistChunks(song), getArtistChunks(song2));
 
-    console.log(withinDeltaDuration, songNamesExact, songNamesOverlap, commonArtists);
-
     return (songNamesExact || (songNamesOverlap && withinDeltaDuration)) && commonArtists;
 }
