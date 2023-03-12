@@ -6,6 +6,7 @@ type GenericSong = {
     artist: string;
     lengthSeconds: number;
     provider: "apple" | "spotify";
+    artistList?: string[];
 }
 
 export default GenericSong;

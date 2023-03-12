@@ -1,18 +1,15 @@
 import type GenericSong from "../types/genericSong";
 import {getLikes} from "./db.js";
-
-// ew
-const replaceMe = /\W[([ ]?(feat. [^)\n]+|(Live( [0-9]+)?|Remastered|Radio|Original|Extended|[0-9]+),?( (Edit|Recording|Mix|Version|Remaster|[0-9]+))*)[ \])]?|\(From [^)]+\)/gi;
-const cleanUp = (str: string) => str.toLowerCase().replace(replaceMe, " ").replace(/[^A-Za-z0-9]/g, " ").replace(/ {2,}/g, " ").trim();
-
-const startsWithCross = (a: string, b: string) => cleanUp(a).startsWith(cleanUp(b)) || cleanUp(b).startsWith(cleanUp(a));
+import {cleanUp, compareSongs} from "./compareSongs.js";
 
 export const intersect = (songs: GenericSong[], songs2: GenericSong[]): GenericSong[][] => {
+    console.log(songs);
     const intersectedSongs: GenericSong[][] = [];
     songs2.forEach((song2) => {
         let found = false;
         songs.forEach((song) => {
-            if (!found && startsWithCross(song.name, song2.name) && startsWithCross(song.artist, song2.artist)) {
+            if (cleanUp(song.name).includes("me out of") && cleanUp(song2.name).includes("me out of")) console.log(cleanUp(song.artist), cleanUp(song2.artist));
+            if (!found && compareSongs(song, song2)) {
                 intersectedSongs.push([song, song2]);
                 found = true;
             }

@@ -44,6 +44,7 @@ const mapSong = (song: SavedTrackObject) : GenericSong => ({
     providerId: song.track.id,
     name: song.track.name,
     artist: mapArtists(song.track.artists),
+    artistList: song.track.artists.map((artist) => artist.name),
     lengthSeconds: song.track.duration_ms / 1000,
     provider: "spotify",
 });

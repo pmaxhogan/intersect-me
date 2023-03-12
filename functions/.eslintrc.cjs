@@ -29,6 +29,7 @@ module.exports = {
     "import/no-unresolved": 0,
     "indent": ["error", 4],
     "max-len": ["error", 200],
-    "no-debugger": "off"
+    "no-debugger": "off",
+    "comma-dangle": "off"
   },
 };
