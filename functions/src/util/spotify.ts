@@ -7,12 +7,10 @@ import {Artists, fetchApiCallback, offsetOpts, SavedTrackObject} from "../types/
 config();
 
 export const getSpotifyApi = () => new SpotifyWebApi({
-    redirectUri: process.env.SPOTIFY_REDIRECT_URI,
+    redirectUri: process.env.NODE_ENV === "production" ? process.env.SPOTIFY_REDIRECT_URI_PROD : process.env.SPOTIFY_REDIRECT_URI_LOCAL,
     clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
 });
-const spotifyApi = getSpotifyApi();
-spotifyApi.setAccessToken(process.env.SPOTIFY_TOKEN as string);
 
 
 // const scopes = "user-library-read user-follow-read playlist-read-private playlist-read-collaborative user-top-read user-read-recently-played".split(" ");
