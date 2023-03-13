@@ -134,13 +134,14 @@ app.get("/api/lookup-uids", authenticate, async (req, res) => {
 });
 
 app.post("/api/add-following", authenticate, async (req, res) => {
-    const newFollowing = req.query["following"];
+    let newFollowing = req.query["following"];
     console.log("newFollowing", newFollowing);
     if (typeof newFollowing !== "string" || !validateUsername(newFollowing)) {
         console.log("invalid username");
         res.status(400).send({status: "error", message: "invalid username"});
         return;
     }
+    newFollowing = newFollowing.toLowerCase();
     let newFollowingUid;
 
     try {
@@ -184,11 +185,12 @@ app.post("/api/add-following", authenticate, async (req, res) => {
 });
 
 app.post("/api/update-username", authenticate, async (req, res) => {
-    const username = req.query["username"];
+    let username = req.query["username"];
     if (typeof username !== "string" || !validateUsername(username)) {
         res.status(400).send({status: "error", message: "Invalid username"});
         return;
     }
+    username = username.toLowerCase();
 
     const {uid} = (req as AuthenticatedRequest).user;
     console.log("uid", uid);
