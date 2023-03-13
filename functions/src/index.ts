@@ -19,6 +19,14 @@ const MAX_UIDS = 10000;
 const auth = getAuth();
 const app = express();
 
+app.get("/", (req, res) => {
+    res.send("hello/");
+});
+
+app.get("/api", (req, res) => {
+    res.send("hello/api");
+});
+
 app.get("/api/spotify-sync", async (req, res) => {
     const authKey = req.headers["x-auth-key"] || req.query["token"];
     if (typeof authKey !== "string") {
@@ -31,7 +39,7 @@ app.get("/api/spotify-sync", async (req, res) => {
 
 
     const spotifyApi = new SpotifyWebApi({
-        redirectUri: process.env.SPOTIFY_REDIRECT_URI,
+        redirectUri: process.env.NODE_ENV === "production" ? process.env.SPOTIFY_REDIRECT_URI_PROD : process.env.SPOTIFY_REDIRECT_URI_LOCAL,
         clientId: process.env.SPOTIFY_CLIENT_ID,
         clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
     });
