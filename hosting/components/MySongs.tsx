@@ -4,22 +4,22 @@ import {GenericSong, GetSongsResult} from "../types/api";
 import Typography from "@mui/material/Typography";
 import useUser from "../hooks/useUser";
 import SongsResults from "./SongsResults";
-import useFetchWithAuth from "../hooks/useFetchWithAuth";
+import useApiFetch from "../hooks/useApiFetch";
 
 
 export default function MySongs() {
     const router = useRouter();
     const {user, loading} = useUser();
     const [mySongs, setMySongs] = useState(null as GenericSong[] | null);
-    const fetchWithAuth = useFetchWithAuth();
+    const {errorComponent, apiFetch} = useApiFetch();
 
     const [search, setSearch] = React.useState("");
 
     useEffect(() => {
         (async () => {
             if (user) {
-                const req = await fetchWithAuth(`/api/my-songs`);
-                const {songs} = await req.json() as GetSongsResult;
+                const {status, message, results} = await apiFetch(`/api/my-songs`);
+                const {songs} = results as GetSongsResult;
                 setMySongs(songs);
             }
         })();
@@ -31,5 +31,6 @@ export default function MySongs() {
     return <div>
         <Typography variant={"h2"} component={"h1"}>My Songs</Typography>
         <SongsResults songs={mySongs}/>
+        {errorComponent}
     </div>;
 }

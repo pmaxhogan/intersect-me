@@ -85,34 +85,43 @@ app.get("/api/redirect", async (req, res) => {
 app.post("/api/intersect", authenticate, async (req, res) => {
     const destUid = req.query["uid"];
     if (typeof destUid !== "string") {
-        res.send("error");
+        res.status(400).send({status: "error", message: "Invalid uid"});
         return;
     }
 
     const {uid: myUid} = (req as AuthenticatedRequest).user;
 
-    const intersections = await intersectUids(myUid, destUid);
+    try {
+        const intersections = await intersectUids(myUid, destUid);
 
-    res.json(intersections);
+        res.json({status: "ok", results: intersections});
+    } catch (e) {
+        res.json({status: "error", message: "Could not get songs"});
+    }
 });
 
 app.get("/api/my-songs", authenticate, async (req, res) => {
     const {uid} = (req as AuthenticatedRequest).user;
     console.log("uid", uid);
 
-    const songs = await getLikes(uid);
-    res.json({songs});
+    try {
+        const songs = await getLikes(uid);
+        res.json({status: "ok", results: {songs}});
+    } catch (e) {
+        console.error(e);
+        res.json({status: "error", message: "Could not get songs"});
+    }
 });
 
 app.get("/api/lookup-uids", authenticate, async (req, res) => {
     const uids = req.query["uids"];
     if (typeof uids !== "string") {
-        res.send("error");
+        res.status(400).send({status: "error", message: "Invalid uids"});
         return;
     }
     const split = uids.split(",");
     if (split.length === 0 || split.length > MAX_UIDS) {
-        res.send("error");
+        res.status(400).send({status: "error", message: "Invalid uids"});
         return;
     }
 
@@ -121,7 +130,7 @@ app.get("/api/lookup-uids", authenticate, async (req, res) => {
         const username = await uidToUsername(uid);
         return [uid, username];
     }));
-    res.json({usernames: Object.fromEntries(usernames)});
+    res.json({status: "ok", results: {usernames: Object.fromEntries(usernames)}});
 });
 
 app.post("/api/add-following", authenticate, async (req, res) => {
@@ -129,7 +138,7 @@ app.post("/api/add-following", authenticate, async (req, res) => {
     console.log("newFollowing", newFollowing);
     if (typeof newFollowing !== "string" || !validateUsername(newFollowing)) {
         console.log("invalid username");
-        res.send("error");
+        res.status(400).send({status: "error", message: "invalid username"});
         return;
     }
     let newFollowingUid;
@@ -138,31 +147,46 @@ app.post("/api/add-following", authenticate, async (req, res) => {
         newFollowingUid = await usernameToUid(newFollowing);
     } catch (e) {
         res.status(404);
-        res.send("error");
+        res.send({status: "error", message: "User not found"});
         return;
     }
 
     const {uid} = (req as AuthenticatedRequest).user;
-    const doc = await getUserDoc(uid);
+    let doc;
+    try {
+        doc = await getUserDoc(uid);
+    } catch (e) {
+        console.log("error", e);
+        res.status(400).send({status: "error", message: "Error following"});
+        return;
+    }
+
     const following = doc?.following || [];
 
     if (following.includes(newFollowing)) {
         console.log("already following");
-        res.send("ok");
+        res.send({status: "ok"});
         return;
     }
 
     following.push(newFollowingUid);
 
-    await updateMeta(uid, {
-        following,
-    });
+    try {
+        await updateMeta(uid, {
+            following,
+        });
+
+        res.send({status: "ok"});
+    } catch (e) {
+        console.log("error", e);
+        res.status(400).send({status: "error", message: "Error following"});
+    }
 });
 
 app.post("/api/update-username", authenticate, async (req, res) => {
     const username = req.query["username"];
     if (typeof username !== "string" || !validateUsername(username)) {
-        res.send({status: "error", message: "Invalid username"});
+        res.status(400).send({status: "error", message: "Invalid username"});
         return;
     }
 
@@ -173,18 +197,23 @@ app.post("/api/update-username", authenticate, async (req, res) => {
     try {
         const uid2 = await usernameToUid(username);
         if (uid2 && uid !== uid2) {
-            res.send({status: "error", message: "Username is taken"});
+            res.status(400).send({status: "error", message: "Username is taken"});
             return;
         }
     } catch (ignored) {
         // ignore
     }
 
-    await updateMeta(uid, {
-        username,
-    });
+    try {
+        await updateMeta(uid, {
+            username,
+        });
 
-    res.send({status: "ok"});
+        res.send({status: "ok"});
+    } catch (e) {
+        console.log("error", e);
+        res.status(400).send({status: "error", message: "Error updating username"});
+    }
 });
 
 export const api = functions.https.onRequest(app);

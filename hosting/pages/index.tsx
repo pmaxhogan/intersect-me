@@ -7,11 +7,9 @@ import RssFeedIcon from '@mui/icons-material/RssFeed';
 import useUser from "../hooks/useUser";
 import MySongs from "../components/MySongs";
 import MyFollowing from "../components/MyFollowing";
-import useFetchWithAuth from "../hooks/useFetchWithAuth";
 
 export default function IndexPage() {
     const {user, loading} = useUser();
-    const fetchWithAuth = useFetchWithAuth();
 
     return (
         <main>
