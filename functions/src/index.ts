@@ -126,9 +126,9 @@ app.get("/api/lookup-uids", authenticate, async (req, res) => {
 
 app.post("/api/add-following", authenticate, async (req, res) => {
     const newFollowing = req.query["following"];
-    functions.logger.log("newFollowing", newFollowing);
+    console.log("newFollowing", newFollowing);
     if (typeof newFollowing !== "string" || !validateUsername(newFollowing)) {
-        functions.logger.log("invalid username");
+        console.log("invalid username");
         res.send("error");
         return;
     }
@@ -147,6 +147,7 @@ app.post("/api/add-following", authenticate, async (req, res) => {
     const following = doc?.following || [];
 
     if (following.includes(newFollowing)) {
+        console.log("already following");
         res.send("ok");
         return;
     }

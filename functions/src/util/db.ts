@@ -42,6 +42,7 @@ export const getLikes = async (uid: string): Promise<GenericSong[]> => {
 };
 
 export const updateMeta = async (uid: string, document: UserMeta) => {
+    console.log("updating meta", uid, document);
     const db = getFirestore();
     const doc = db.collection("users").doc(uid);
     const meta = await doc.get();
@@ -67,6 +68,7 @@ export const usernameToUid = async (username: string): Promise<string> => {
 };
 
 export const getUserDoc = async (uid: string): Promise<UserMeta | undefined> => {
+    console.log("getting user doc", uid);
     const db = getFirestore();
     const doc = db.collection("users").doc(uid);
     const meta = await doc.get();
