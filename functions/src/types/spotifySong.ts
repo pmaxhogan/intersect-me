@@ -30,3 +30,11 @@ export interface SavedTrackObject {
 export interface Artists {
     name: string
 }
+
+export interface SpotifyPlaylist {
+    name: string;
+    id: string;
+    image?: string;
+    songs: number;
+    owner: string;
+}

@@ -2,6 +2,7 @@ import GenericSong from "../types/genericSong";
 import {getStorage} from "firebase-admin/storage";
 import {getFirestore} from "firebase-admin/firestore";
 import {validateUsername} from "./validateUsername.js";
+import {SpotifyPlaylist} from "../types/spotifySong";
 
 export const saveLikes = async (uid: string, liked: GenericSong[]) => {
     const storage = getStorage();
@@ -112,6 +113,7 @@ type UserMeta = {
     count?: number;
     lastSync?: number;
     following?: uid[];
+    playlists?: SpotifyPlaylist[];
 };
 
 type LikedSongsStore = {

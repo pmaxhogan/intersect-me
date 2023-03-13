@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import SpotifyWebApi from "spotify-web-api-node";
 import setup from "./util/setup.js";
 import express from "express";
-import {getLikedSongs, getSpotifyApi} from "./util/spotify.js";
+import {getLikedSongs, getPlaylists, getSongsFromPlaylist, getSpotifyApi} from "./util/spotify.js";
 import {decrypt, encrypt} from "./util/crypto.js";
 import {getAuth} from "firebase-admin/auth";
 import {deleteUser, getLikes, getUserDoc, saveLikes, uidToUsername, updateMeta, usernameToUid} from "./util/db.js";
@@ -30,9 +30,15 @@ app.get("/api", (req, res) => {
 app.get("/api/spotify-sync", async (req, res) => {
     const authKey = req.headers["x-auth-key"] || req.query["token"];
     if (typeof authKey !== "string") {
-        res.send("error");
+        res.send({status: "error"});
         return;
     }
+    const playlistId = req.query["playlistId"];
+    if (typeof playlistId !== "string" && playlistId !== undefined) {
+        res.send({status: "error"});
+        return;
+    }
+    const searchPlaylists = req.query["searchPlaylists"] === "true";
 
     const {uid} = await auth.verifyIdToken(authKey);
     console.log("uid", uid);
@@ -44,15 +50,18 @@ app.get("/api/spotify-sync", async (req, res) => {
         clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
     });
     const scopes = "user-library-read user-follow-read playlist-read-private playlist-read-collaborative user-top-read user-read-recently-played".split(" ");
-    const url = spotifyApi.createAuthorizeURL(scopes, await encrypt(authKey));
+
+    const authType = searchPlaylists ? "search" : (playlistId ? playlistId : "user");
+
+    const url = spotifyApi.createAuthorizeURL(scopes, await encrypt(authType + "\t" + authKey));
 
     console.log("spotify", url);
     res.redirect(url);
 });
 
 app.get("/api/redirect", async (req, res) => {
-    const {code, state} = req.query ? req.query : {code: null, state: null};
-    console.log("redirect", code, state);
+    const {code, state, extra} = req.query ? req.query : {code: null, state: null, extra: null};
+    console.log("redirect", code, state, extra);
 
     if (typeof code !== "string" || typeof state !== "string") {
         res.send("error");
@@ -62,8 +71,9 @@ app.get("/api/redirect", async (req, res) => {
     const decrypted = await decrypt(state);
     console.log("decrypted", decrypted);
     console.log("redirect", code);
+    const [authType, authKey] = decrypted.split("\t");
 
-    const {uid} = await auth.verifyIdToken(decrypted);
+    const {uid} = await auth.verifyIdToken(authKey);
     console.log("grabbed UID from state", uid);
 
     const spotifyApi = getSpotifyApi();
@@ -71,15 +81,38 @@ app.get("/api/redirect", async (req, res) => {
     spotifyApi.setAccessToken(body.access_token);
     spotifyApi.setRefreshToken(body.refresh_token);
 
-    const liked = await getLikedSongs(spotifyApi);
+    if (authType === "user") {
+        const liked = await getLikedSongs(spotifyApi);
 
-    await saveLikes(uid, liked);
-    await updateMeta(uid, {
-        count: liked.length,
-        lastSync: Date.now(),
-    });
+        await saveLikes(uid, liked);
+        await updateMeta(uid, {
+            count: liked.length,
+            lastSync: Date.now(),
+            playlists: []
+        });
 
-    res.redirect("/");
+        res.redirect("/");
+    } else if (authType === "search") {
+        const playlists = await getPlaylists(spotifyApi);
+
+        await updateMeta(uid, {
+            playlists
+        });
+
+
+        res.redirect("/link/spotify/playlists");
+    } else {
+        const liked = await getSongsFromPlaylist(spotifyApi, authType);
+
+        await saveLikes(uid, liked);
+        await updateMeta(uid, {
+            count: liked.length,
+            lastSync: Date.now(),
+            playlists: []
+        });
+
+        res.redirect("/");
+    }
 });
 
 app.post("/api/intersect", authenticate, async (req, res) => {

@@ -22,11 +22,20 @@ export interface GetSongsResult {
 export type uid = string;
 export type username = string;
 
+export interface SpotifyPlaylist {
+    name: string;
+    id: string;
+    image?: string;
+    songs: number;
+    owner: string;
+}
+
 export type UserMeta = {
     username?: string;
     count?: number;
     lastSync?: number;
     following?: uid[];
+    playlists?: SpotifyPlaylist[];
 };
 
 export type LookupUidsResult = {

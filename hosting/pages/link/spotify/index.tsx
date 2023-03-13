@@ -16,11 +16,19 @@ export default function Spotify() {
         }
     };
 
+    const linkPlaylist = async () => {
+        if (user) {
+            const token = await user.getIdToken(true);
+
+            location.href = `/api/spotify-sync?searchPlaylists=true&token=${encodeURIComponent(token)}`;
+        }
+    };
+
     return <div>
         <Typography variant={"h2"} component={"h1"}>Choose What to Link</Typography>
         <ResultsStack elements={[
             <ForwardButton title={"Entire Library"} onClick={linkLibrary} leftIcon={<LibraryMusicIcon/>}/>,
-            <ForwardButton title={"Specific Playlist"} to={"/link/spotify/playlist"} leftIcon={<QueueMusicIcon/>}/>
+            <ForwardButton title={"Specific Playlist"} onClick={linkPlaylist} leftIcon={<QueueMusicIcon/>}/>
         ]}/>
     </div>
 }

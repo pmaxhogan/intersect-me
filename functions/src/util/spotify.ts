@@ -2,7 +2,7 @@ import {config} from "dotenv";
 
 import SpotifyWebApi from "spotify-web-api-node";
 import GenericSong from "../types/genericSong";
-import {Artists, fetchApiCallback, offsetOpts, SavedTrackObject} from "../types/spotifySong";
+import {Artists, fetchApiCallback, offsetOpts, SavedTrackObject, SpotifyPlaylist} from "../types/spotifySong";
 
 config();
 
@@ -55,4 +55,25 @@ const getLikedSongs = async (spotifyApi: SpotifyWebApi) => {
     return songs;
 };
 
-export {getLikedSongs};
+const getSongsFromPlaylist = async (spotifyApi: SpotifyWebApi, playlistId: string) => {
+    const results = await fetchAllPages((opts: offsetOpts | undefined) => spotifyApi.getPlaylistTracks(playlistId, opts)) as SavedTrackObject[];
+    const songs = results.filter(songIsValid).map(mapSong);
+    console.log("spotify songs", songs.length);
+    return songs;
+};
+
+const mapPlaylists = (playlists: any[]) => playlists.map((playlist) => ({
+    name: playlist.name,
+    id: playlist.id,
+    image: playlist.images[0] ? playlist.images[0].url : null,
+    songs: playlist.tracks.total,
+    owner: playlist.owner.display_name,
+})) as SpotifyPlaylist[];
+
+const getPlaylists = async (spotifyApi: SpotifyWebApi) => {
+    const results = await fetchAllPages((opts: offsetOpts | undefined) => spotifyApi.getUserPlaylists(opts));
+    console.log("spotify songs", results.length);
+    return mapPlaylists(results);
+};
+
+export {getLikedSongs, getSongsFromPlaylist, getPlaylists};
