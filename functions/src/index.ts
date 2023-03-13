@@ -5,7 +5,7 @@ import express from "express";
 import {getLikedSongs, getSpotifyApi} from "./util/spotify.js";
 import {decrypt, encrypt} from "./util/crypto.js";
 import {getAuth} from "firebase-admin/auth";
-import {getLikes, getUserDoc, saveLikes, uidToUsername, updateMeta, usernameToUid} from "./util/db.js";
+import {deleteUser, getLikes, getUserDoc, saveLikes, uidToUsername, updateMeta, usernameToUid} from "./util/db.js";
 import {intersectUids} from "./util/intersect.js";
 
 import authenticate, {AuthenticatedRequest} from "./util/authenticate.js";
@@ -218,4 +218,6 @@ app.post("/api/update-username", authenticate, async (req, res) => {
 
 export const api = functions.https.onRequest(app);
 
-
+export const deleteUserInfo = functions.auth.user().onDelete(async (user) => {
+    await deleteUser(user.uid);
+});

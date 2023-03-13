@@ -80,6 +80,27 @@ export const getUserDoc = async (uid: string): Promise<UserMeta | undefined> => 
     return meta?.data();
 };
 
+export const deleteUser = async (uid: string) => {
+    const db = getFirestore();
+    const doc = db.collection("users").doc(uid);
+    const meta = await doc.get();
+    if (meta.exists) {
+        await doc.delete();
+    }
+
+    const storage = getStorage();
+    const bucket = storage.bucket();
+
+    const folder = "uploaded";
+    const filename = `${uid}.json`;
+
+    const file = bucket.file(`${folder}/${filename}`);
+    const [exists] = await file.exists();
+    if (exists) {
+        await file.delete();
+    }
+};
+
 export const uidToUsername = async (uid: string): Promise<string | undefined> => {
     return (await getUserDoc(uid))?.username;
 };
