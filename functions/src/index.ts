@@ -6,10 +6,10 @@ import {getLikedSongs, getPlaylists, getSongsFromPlaylist, getSpotifyApi} from "
 import {decrypt, encrypt} from "./util/crypto.js";
 import {getAuth} from "firebase-admin/auth";
 import {deleteUser, getLikes, getUserDoc, saveLikes, uidToUsername, updateMeta, usernameToUid} from "./util/db.js";
-import {intersectUids} from "./util/intersect.js";
 
 import authenticate, {AuthenticatedRequest} from "./util/authenticate.js";
 import {validateUsername} from "./util/validateUsername.js";
+import {intersectUids} from "./util/intersectUids.js";
 
 setup();
 
@@ -125,6 +125,7 @@ app.post("/api/intersect", authenticate, async (req, res) => {
     const {uid: myUid} = (req as AuthenticatedRequest).user;
 
     try {
+        console.log(myUid, destUid);
         const intersections = await intersectUids(myUid, destUid);
 
         res.json({status: "ok", results: intersections});
