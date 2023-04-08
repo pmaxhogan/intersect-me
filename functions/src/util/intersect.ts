@@ -3,6 +3,7 @@ import {getLikes} from "./db.js";
 import {compareSongs} from "./compareSongs.js";
 
 export const intersect = (songs: GenericSong[], songs2: GenericSong[]): GenericSong[][] => {
+    console.time("intersect");
     const usedSong1s = new Set();
     const usedSong2s = new Set();
 
@@ -18,6 +19,7 @@ export const intersect = (songs: GenericSong[], songs2: GenericSong[]): GenericS
             }
         });
     });
+    console.timeEnd("intersect");
     return intersectedSongs;
 };
 
