@@ -126,7 +126,7 @@ app.post("/api/intersect", authenticate, async (req, res) => {
 
     try {
         console.log(myUid, destUid);
-        const intersections = await intersectUids(myUid, destUid);
+        const intersections = await intersectUids(destUid, myUid);
 
         res.json({status: "ok", results: intersections});
     } catch (e) {

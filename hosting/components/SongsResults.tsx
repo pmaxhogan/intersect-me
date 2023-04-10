@@ -1,5 +1,4 @@
 import React from "react";
-import {useRouter} from "next/navigation";
 import {GenericSong} from "../types/api";
 import Card from "@mui/material/Card";
 import ResultsStack from "./ResultsStack";
@@ -11,10 +10,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import ButtonStack from "./ButtonStack";
 import SongCard from "./SongCard";
 import {Alert} from "@mui/material";
+import sortSongs from "../lib/sortSongs";
 
 
 export default function SongsResults({songs}: { songs: GenericSong[] }) {
-    const router = useRouter();
     const [search, setSearch] = React.useState("");
 
     // TODO: improve this
@@ -22,7 +21,7 @@ export default function SongsResults({songs}: { songs: GenericSong[] }) {
         return !search || (song.name.toLowerCase().includes(search.toLowerCase()) || song.artist.toLowerCase().includes(search.toLowerCase()));
     };
 
-    const songCards = songs.length ? songs.filter(song => filterSong(song, search))
+    const songCards = songs.length ? sortSongs(songs).filter(song => filterSong(song, search))
         .map((song, i) => (
             <SongCard key={i} song={song}/>
         )) : [<Card><Alert severity="info">Nothing found :(</Alert></Card>];
